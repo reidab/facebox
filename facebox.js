@@ -85,6 +85,7 @@
       opacity      : 0,
       overlay      : true,
       contentWidth : null,
+      contentOffset: 0,
       loadingImage : '/static/facebox/loading.gif',
       closeImage   : '/static/facebox/closelabel.gif',
       imageTypes   : [ 'png', 'jpg', 'jpeg', 'gif' ],
@@ -129,7 +130,7 @@
 
       $('#facebox').css({
         top:	getPageScroll()[1] + (getPageHeight() / 10),
-        left:	getPageWidth() / 2 - 205
+        left:	getPageWidth() / 2 - 205 + $.facebox.settings.contentOffset
       }).show()
 
       $(document).bind('keydown.facebox', function(e) {
@@ -145,7 +146,7 @@
       $('#facebox .content').append(data)
       $('#facebox .loading').remove()
       $('#facebox .body').children().fadeIn('normal')
-      $('#facebox').css('left', getPageWidth() / 2 - ($('#facebox table').width() / 2))
+      $('#facebox').css('left', getPageWidth() / 2 - ($('#facebox table').width() / 2)) + $.facebox.settings.contentOffset
       $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
     },
 
