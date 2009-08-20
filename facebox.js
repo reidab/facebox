@@ -11,9 +11,9 @@
  * Copyright 2007, 2008 Chris Wanstrath [ chris@ozmm.org ]
  *
  * Usage:
- *
+ *  
  *  jQuery(document).ready(function() {
- *    jQuery('a[rel*=facebox]').facebox()
+ *    jQuery('a[rel*=facebox]').facebox() 
  *  })
  *
  *  <a href="#terms" rel="facebox">Terms</a>
@@ -27,13 +27,13 @@
  *
  *
  *  You can also use it programmatically:
- *
+ * 
  *    jQuery.facebox('some html')
  *    jQuery.facebox('some html', 'my-groovy-style')
  *
  *  The above will open a facebox with "some html" as the content.
- *
- *    jQuery.facebox(function($) {
+ *    
+ *    jQuery.facebox(function($) { 
  *      $.get('blah.html', function(data) { $.facebox(data) })
  *    })
  *
@@ -41,7 +41,7 @@
  *  allowing for a better ajaxy experience.
  *
  *  The facebox function can also display an ajax page, an image, or the contents of a div:
- *
+ *  
  *    jQuery.facebox({ ajax: 'remote.html' })
  *    jQuery.facebox({ ajax: 'remote.html' }, 'my-groovy-style')
  *    jQuery.facebox({ image: 'stairs.jpg' })
@@ -84,8 +84,9 @@
     settings: {
       opacity      : 0,
       overlay      : true,
-      loadingImage : '/facebox/loading.gif',
-      closeImage   : '/facebox/closelabel.gif',
+      contentWidth : null,
+      loadingImage : '/static/facebox/loading.gif',
+      closeImage   : '/static/facebox/closelabel.gif',
       imageTypes   : [ 'png', 'jpg', 'jpeg', 'gif' ],
       faceboxHtml  : '\
     <div id="facebox" style="display:none;"> \
@@ -102,7 +103,7 @@
                 </div> \
                 <div class="footer"> \
                   <a href="#" class="close"> \
-                    <img src="/facebox/closelabel.gif" title="close" class="close_image" /> \
+                    <img src="/static/facebox/closelabel.gif" title="close" class="close_image" /> \
                   </a> \
                 </div> \
               </td> \
@@ -128,7 +129,7 @@
 
       $('#facebox').css({
         top:	getPageScroll()[1] + (getPageHeight() / 10),
-        left:	$(window).width() / 2 - 205
+        left:	getPageWidth() / 2 - 205
       }).show()
 
       $(document).bind('keydown.facebox', function(e) {
@@ -144,7 +145,7 @@
       $('#facebox .content').append(data)
       $('#facebox .loading').remove()
       $('#facebox .body').children().fadeIn('normal')
-      $('#facebox').css('left', $(window).width() / 2 - ($('#facebox table').width() / 2))
+      $('#facebox').css('left', getPageWidth() / 2 - ($('#facebox table').width() / 2))
       $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
     },
 
@@ -159,8 +160,6 @@
    */
 
   $.fn.facebox = function(settings) {
-    if ($(this).length == 0) return
-
     init(settings)
 
     function clickHandler() {
@@ -208,7 +207,7 @@
     $('#facebox .close').click($.facebox.close)
     $('#facebox .close_image').attr('src', $.facebox.settings.closeImage)
   }
-
+  
   // getPageScroll() by quirksmode.com
   function getPageScroll() {
     var xScroll, yScroll;
@@ -220,9 +219,9 @@
       xScroll = document.documentElement.scrollLeft;
     } else if (document.body) {// all other Explorers
       yScroll = document.body.scrollTop;
-      xScroll = document.body.scrollLeft;
+      xScroll = document.body.scrollLeft;	
     }
-    return new Array(xScroll,yScroll)
+    return new Array(xScroll,yScroll) 
   }
 
   // Adapted from getPageSize() by quirksmode.com
@@ -234,8 +233,12 @@
       windowHeight = document.documentElement.clientHeight;
     } else if (document.body) { // other Explorers
       windowHeight = document.body.clientHeight;
-    }
+    }	
     return windowHeight
+  }
+  
+  function getPageWidth() {
+    return $.facebox.settings.contentWidth || $(window).width();
   }
 
   // Backwards compatibility
@@ -258,8 +261,7 @@
     if (href.match(/#/)) {
       var url    = window.location.href.split('#')[0]
       var target = href.replace(url,'')
-      if (target == '#') return
-      $.facebox.reveal($(target).html(), klass)
+      $.facebox.reveal($(target).show().replaceWith("<div id='facebox_moved'></div>"), klass)
 
     // image
     } else if (href.match($.facebox.settings.imageTypesRegexp)) {
@@ -283,13 +285,13 @@
   }
 
   function skipOverlay() {
-    return $.facebox.settings.overlay == false || $.facebox.settings.opacity === null
+    return $.facebox.settings.overlay == false || $.facebox.settings.opacity === null 
   }
 
   function showOverlay() {
     if (skipOverlay()) return
 
-    if ($('#facebox_overlay').length == 0)
+    if ($('#facebox_overlay').length == 0) 
       $("body").append('<div id="facebox_overlay" class="facebox_hide"></div>')
 
     $('#facebox_overlay').hide().addClass("facebox_overlayBG")
@@ -304,10 +306,10 @@
 
     $('#facebox_overlay').fadeOut(200, function(){
       $("#facebox_overlay").removeClass("facebox_overlayBG")
-      $("#facebox_overlay").addClass("facebox_hide")
+      $("#facebox_overlay").addClass("facebox_hide") 
       $("#facebox_overlay").remove()
     })
-
+    
     return false
   }
 
@@ -318,7 +320,8 @@
   $(document).bind('close.facebox', function() {
     $(document).unbind('keydown.facebox')
     $('#facebox').fadeOut(function() {
-      $('#facebox .content').removeClass().addClass('content')
+      if ($('#facebox_moved').length == 0) $('#facebox .content').removeClass().addClass('content')
+      else $('#facebox_moved').replaceWith($('#facebox .content').children().hide())
       hideOverlay()
       $('#facebox .loading').remove()
     })
